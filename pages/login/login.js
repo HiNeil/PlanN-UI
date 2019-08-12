@@ -3,14 +3,14 @@ const app = getApp();
 Page({
   data: {
     //判断小程序的API，回调，参数，组件等是否在当前版本可用。
-    canIUse: wx.canIUse('button.open-type.getUserInfo')
+    canIUse: wx.canIUse('button.open-type.getUserInfo'),
+    userInfoAuthorized: false
   },
-  onLoad: function () {
+  onLoad: function() {
     var that = this;
-    // 如果用户的版本不支持的话就用 wx.getUserInfo 来弹框授权
-    if (!canIUse) {
+    if (!this.data.canIUse) { // 如果用户的版本不支持的话就用 wx.getUserInfo 来弹框授权
       wx.getUserInfo({
-        success: function (res) {
+        success: function(res) {
           //用户已经授权过
           //从数据库获取用户信息
           // that.queryUsreInfo();
@@ -23,7 +23,7 @@ Page({
       });
     }
   },
-  getUserInfo: function (e) {
+  getUserInfo: function(e) {
     if (e.detail.userInfo) {
       //用户按了允许授权按钮
       var that = this;
@@ -47,7 +47,17 @@ Page({
       //   }
       // });
       //设置用户信息为全局变量
-      app.globalData.userInfo=e.detail.userInfo
+      console.log("login userInfo" + e.detail.userInfo.nickName)
+      app.globalData.userInfo = e.detail.userInfo
+      app.globalData.userInfoAuthorized = true
+      console.log("app user Info" + app.globalData.userInfo.nickName)
+      //获取上一个页面 即index，并重新执行onLoad
+      var pages = getCurrentPages()
+      var indexPage = pages[pages.length - 2]
+      console.log(indexPage)
+      if (indexPage != undefined && indexPage != null) {
+        indexPage.onLoad();
+      }
       //授权成功后，跳转进入小程序首页
       wx.switchTab({
         url: '../index/index'
@@ -59,7 +69,7 @@ Page({
         content: '您点击了拒绝授权，将无法进入小程序，请授权之后再进入',
         showCancel: false,
         confirmText: '返回授权',
-        success: function (res) {
+        success: function(res) {
           if (res.confirm) {
             console.log('用户点击了“返回授权”')
           }
@@ -68,7 +78,7 @@ Page({
     }
   },
   //获取用户信息接口
-  queryUsreInfo: function () {
+  queryUsreInfo: function() {
     wx.request({
       url: getApp().globalData.urlPath + 'hstc_interface/queryByOpenid',
       data: {
@@ -77,7 +87,7 @@ Page({
       header: {
         'content-type': 'application/json'
       },
-      success: function (res) {
+      success: function(res) {
         console.log(res.data);
         getApp().globalData.userInfo = res.data;
       }
