@@ -1,4 +1,3 @@
-
 const app = getApp()
 
 Page({
@@ -7,18 +6,17 @@ Page({
    * 页面的初始数据
    */
   data: {
-    userInfo:{},
-    plans:[
-      {
-        id:1,
-        planName:'plan1',
-        appliedFlag:false
+    userInfo: null,
+    plans: [{
+        id: 1,
+        planName: 'plan1',
+        appliedFlag: false
       },
       {
         id: 2,
         planName: 'plan2',
         appliedFlag: false
-      }, 
+      },
       {
         id: 3,
         planName: 'plan3',
@@ -27,7 +25,7 @@ Page({
       {
         id: 4,
         planName: 'plan4',
-        appliedFlag: true  
+        appliedFlag: true
       },
       {
         id: 5,
@@ -35,8 +33,7 @@ Page({
         appliedFlag: false
       }
     ],
-    reminds:[
-      {
+    reminds: [{
         id: 1,
         info: 'ainiyo1',
         appliedFlag: false
@@ -67,28 +64,41 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
+  onLoad: function() {
     this.setData({
       userInfo: app.globalData.userInfo
-    })
+    });
+    console.log("login ed")
+  },
+  //设置回调函数，登陆完成后重新调用onLoad
+  setLoginCallBack: function() {
+    var that = this;
+    if (app.globalData.userInfo) {
+      that.onLoad();
+    } else {
+      app.myCallBack = res => that.onLoad();
+      wx.switchTab({
+        url: '../index/index',
+      })
+    }
   },
   /**
    * 弹框激活还是查看
    */
   activePlan: function() {
     wx.showActionSheet({
-      itemList: ['查看计划', '激活计划' ],
-      success: function (res) {
+      itemList: ['查看计划', '激活计划'],
+      success: function(res) {
         if (!res.cancel) {
           console.log(res.tapIndex)
         }
       }
     });
   },
-  activeRemind: function () {
+  activeRemind: function() {
     wx.showActionSheet({
       itemList: ['查看提醒', '激活提醒'],
-      success: function (res) {
+      success: function(res) {
         if (!res.cancel) {
           console.log(res.tapIndex)
         }
@@ -99,49 +109,49 @@ Page({
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
-  onReady: function () {
-    
+  onReady: function() {
+
   },
 
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow: function () {
-    
+  onShow: function() {
+
   },
 
   /**
    * 生命周期函数--监听页面隐藏
    */
-  onHide: function () {
-    
+  onHide: function() {
+
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
-  onUnload: function () {
-    
+  onUnload: function() {
+
   },
 
   /**
    * 页面相关事件处理函数--监听用户下拉动作
    */
-  onPullDownRefresh: function () {
-    
+  onPullDownRefresh: function() {
+
   },
 
   /**
    * 页面上拉触底事件的处理函数
    */
-  onReachBottom: function () {
-    
+  onReachBottom: function() {
+
   },
 
   /**
    * 用户点击右上角分享
    */
-  onShareAppMessage: function () {
-    
+  onShareAppMessage: function() {
+
   }
 })

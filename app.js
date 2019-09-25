@@ -9,6 +9,14 @@ App({
     // 登录 获取code
     wx.login({
       success: res => {
+        console.log("code:" + res.code)
+        wx.request({
+          url: this.globalData.host + '/plan/login/get/userInfo?jscode=' + res.code,
+          success: res => {
+            this.globalData.userId = res.data
+            console.log("userId:" + res.data)
+          }
+        })
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
       }
     })
@@ -36,6 +44,7 @@ App({
   globalData: {
     userInfo: null,
     openId: null,
-    userId: null
+    userId: null,
+    host: "https://techedge.top"
   }
 })

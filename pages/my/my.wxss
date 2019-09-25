@@ -6,3 +6,9 @@
 .text-style{
   color:orange;
 }
+
+.bottom {
+  border-radius: 80rpx;
+  margin: 170rpx 50rpx;
+  font-size: 35rpx;
+}

@@ -4,13 +4,15 @@ const app = getApp()
 
 Page({
   data: {
+    userId: null,
     userInfo: null,
     hasUserInfo: false,
     userInfoAuthorized: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     planName: "null",
     remindInfo: "亲爱的，不要忘记吃药！",
-    appliedPlan: [{
+    appliedPlan:null,
+    appliedPlanHard: [{
       number: 1,
       desc: '健身房健身',
       finished: true
@@ -54,15 +56,34 @@ Page({
       // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
       // 所以此处加入 callback 以防止这种情况
       app.userInfoReadyCallback = res => {
-        setTimeout(function () {
-          //要延时执行的代码
-        }, 20000)
+        // setTimeout(function () {
+        //   //要延时执行的代码
+        // }, 20000)
         this.setData({
           userInfo: res.userInfo,
           hasUserInfo: true
         });
         console.log("get user Info call back" + this.data.userInfo);
       };
+    }
+    //如果有userId 就设置给当前页面的userId,如果没有就重新获取
+    if (app.globalData.userId) {
+      this.setData({
+        userId: app.globalData.userId
+      })
+    } else {
+      wx.login({
+        success: res => {
+          console.log("code:" + res.code)
+          wx.request({
+            url: this.globalData.host + '/plan/login/get/userInfo?jscode=' + res.code,
+            success: res => {
+              this.globalData.userId = res.data
+              console.log("userId:" + res.data)
+            }
+          })
+        }
+      })
     }
   },
   //用户点击获取用户信息触发
@@ -72,13 +93,16 @@ Page({
       var that = this;
       //插入登录的用户的相关信息到数据库
       //设置用户信息为全局变量
-      console.log("login user Info " + e.detail.userInfo.nickName)
+      console.log("login user Info " + e.detail.userInfo.nickname)
       app.globalData.userInfo = e.detail.userInfo
       this.setData({
         userInfo: e.detail.userInfo,
         hasUserInfo: true,
         userInfoAuthorized: true
       })
+      if (app.myCallBack) {
+        app.myCallBack();
+      }
       console.log("auth " + that.data.userInfoAuthorized)
     } else {
       //用户按了拒绝按钮
@@ -164,6 +188,7 @@ Page({
       wx.getUserInfo({
         success: function (res) {
           // console.log(this.globalData.userInfo)
+
         }
       }),
       wx.login({
