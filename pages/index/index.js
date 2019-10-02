@@ -6,33 +6,11 @@ Page({
   data: {
     userId: null,
     userInfo: null,
-    hasUserInfo: false,
     userInfoAuthorized: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    planName: "null",
     remindInfo: "亲爱的，不要忘记吃药！",
-    appliedPlan:null,
-    appliedPlanHard: [{
-      number: 1,
-      desc: '健身房健身',
-      finished: true
-    },
-    {
-      number: 2,
-      desc: '注册会计师学习',
-      finished: false
-    },
-    {
-      number: 3,
-      desc: 'read 5 pages',
-      finished: true
-    },
-    {
-      number: 4,
-      desc: '弹尤克里里半小时',
-      finished: true
-    }
-    ]
+    appliedPlan: null,
+    appliedPlanDeail: null
   },
   onLoad: function () {
     var that = this
@@ -44,14 +22,20 @@ Page({
           })
         }
       }
-    })
-
+    });
+    //如果有userId 就设置给当前页面的userId,如果没有就重新获取
+    if (app.globalData.userId) {
+      that.setData({
+        userId: app.globalData.userId
+      });
+      that.getUserAppliedPlan(that.data.userId);
+    } else {
+      that.getUserInfoFromServer(this.getUserAppliedPlan);
+    };
     if (app.globalData.userInfo) {
-      this.setData({
+      that.setData({
         userInfo: app.globalData.userInfo,
-        hasUserInfo: true
       })
-      console.log("youma" + this.data.userInfo)
     } else { //如果 onLaunch 中判断已经授权过将直接拿userInfo，还没拿到的话设置回调函数 userInfoReadyCallback
       // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
       // 所以此处加入 callback 以防止这种情况
@@ -59,32 +43,67 @@ Page({
         // setTimeout(function () {
         //   //要延时执行的代码
         // }, 20000)
-        this.setData({
+        that.setData({
           userInfo: res.userInfo,
-          hasUserInfo: true
         });
-        console.log("get user Info call back" + this.data.userInfo);
       };
-    }
-    //如果有userId 就设置给当前页面的userId,如果没有就重新获取
-    if (app.globalData.userId) {
-      this.setData({
-        userId: app.globalData.userId
-      })
-    } else {
-      wx.login({
-        success: res => {
-          console.log("code:" + res.code)
-          wx.request({
-            url: this.globalData.host + '/plan/login/get/userInfo?jscode=' + res.code,
-            success: res => {
-              this.globalData.userId = res.data
-              console.log("userId:" + res.data)
-            }
-          })
+    };
+  },
+  //从服务器获取plans
+  getUserAppliedPlan: function (id) {
+    var that = this;
+    wx.request({
+      url: app.globalData.host + "/plan/plan-info/list/" + id,
+      success: res => {
+        if (res.data.length > 0 && res.data[0].appled == 1) {
+          that.setData({
+            appliedPlan: res.data[0]
+          });
+          that.getPlanDetail(that.data.appliedPlan.id);
+        } else {
+          that.setData({
+            appliedPlan: null
+          });
         }
-      })
-    }
+      }
+    })
+  },
+  getPlanDetail: function (id) {
+    var that = this;
+    wx.request({
+      url: app.globalData.host + "/plan/plan-info/detail/" + id,
+      success: res => {
+        if (res.data.length > 0) {
+          that.setData({
+            appliedPlanDeail: res.data
+          })
+        } else {
+          that.setData({
+            appliedPlanDeail: null
+          });
+        }
+      }
+    })
+  },
+  //从服务器获取用户信息
+  getUserInfoFromServer: function (f) {
+    var that = this
+    // 登录 
+    wx.login({
+      success: res => {
+        wx.request({
+          url: app.globalData.host + '/plan/login/get/userInfo?jscode=' + res.code,
+          success: res => {
+            app.globalData.userId = res.data;
+            that.setData({
+              userId: res.data
+            });
+            f(that.data.userId);
+          }
+        })
+        // 发送 res.code 到后台换取 openId, sessionKey, unionId
+      }
+    })
   },
   //用户点击获取用户信息触发
   clickGetUserInfo: function (e) {
@@ -92,18 +111,16 @@ Page({
       //用户按了允许授权按钮
       var that = this;
       //插入登录的用户的相关信息到数据库
+      this.getUserInfoFromServer(this.getUserAppliedPlan);
       //设置用户信息为全局变量
-      console.log("login user Info " + e.detail.userInfo.nickname)
+      console.log("login user Info " + e.detail.userInfo.nickName)
       app.globalData.userInfo = e.detail.userInfo
       this.setData({
         userInfo: e.detail.userInfo,
-        hasUserInfo: true,
         userInfoAuthorized: true
-      })
-      if (app.myCallBack) {
-        app.myCallBack();
-      }
-      console.log("auth " + that.data.userInfoAuthorized)
+      });
+      if (app.callBackForMy)
+        app.callBackForMy();
     } else {
       //用户按了拒绝按钮
       wx.showModal({
@@ -119,22 +136,39 @@ Page({
       })
     }
   },
-  setFinished: function (e) {
-    var index = e.currentTarget.dataset.idx
-    var currentFinished = this.data.appliedPlan[index].finished
-    for (var i = 0; i < this.data.appliedPlan.length; i++) {
-      if (i == index) {
-        var item = "appliedPlan[" + i + "].finished"; //先用一个变量，把(info[0].gMoney)用字符串拼接起来
-        this.setData({
-          [item]: !currentFinished
-        })
+  onShow: function () {
+    if (this.data.userId)
+      this.getUserAppliedPlan(this.data.userId);
+  },
+  //设置完成或者取消完成
+  setFinished: function (index) {
+    var itemId = this.data.appliedPlanDeail[index].id
+    var planId = this.data.appliedPlan.id
+    var currentFinished = this.data.appliedPlanDeail[index].finished
+    var nextFinished = currentFinished ? 0 : 1;
+    var that = this
+    wx.request({
+      url: app.globalData.host + '/plan/plan-item-change/modify/' + planId + '/' + itemId,
+      data: {
+        'finished': nextFinished
+      },
+      header: {
+        'content-type': 'application/json' // 默认值
+      },
+      method: 'PUT',
+      success: function (res) {
+        var item = "appliedPlanDeail[" + index + "].finished";
+        that.setData({
+          [item]: nextFinished
+        });
+        console.log(res.data);
       }
-    }
+    })
   },
   popConfirmFinished: function (e) {
-    var change = this.setFinished
-    var index = e.currentTarget.dataset.idx
-    var currentFinished = this.data.appliedPlan[index].finished
+    var change = this.setFinished;
+    var index = e.currentTarget.dataset.idx;
+    var currentFinished = this.data.appliedPlanDeail[index].finished
     wx.showModal({
       // title: '',
       content: currentFinished ? '今天未完成该项目？' : '今天已完成该项目？',
@@ -142,10 +176,10 @@ Page({
       cancelText: "取消",
       success: function (res) {
         if (res.confirm) {
-          change(e),
-            console.log('用户点击主操作')
+          change(index);
+          console.log('用户点击确认操作');
         } else {
-          console.log('用户点击辅助操作')
+          console.log('用户点击取消操作');
         }
       }
     });
@@ -168,47 +202,6 @@ Page({
           console.log('用户点击修改操作')
         }
       }
-    });
-  },
-  getSystemInfo: function () {
-    wx.getSystemInfo({
-      success: function (res) {
-        console.log(res)
-      }
-    }),
-      wx.showTabBarRedDot({
-        index: 0
-      }),
-      wx.request({
-        url: 'https://tcb-api.tencentcloudapi.com',
-        success: function (res) {
-          console.log(res)
-        }
-      }),
-      wx.getUserInfo({
-        success: function (res) {
-          // console.log(this.globalData.userInfo)
-
-        }
-      }),
-      wx.login({
-        success: function (res) {
-          console.log(res.code)
-        }
-      })
-    if (this.data.planName) {
-      this.setData({
-        planName: null
-      })
-    } else {
-      this.setData({
-        planName: "test plan name"
-      })
-    }
-    wx.showToast({
-      title: '已完成',
-      icon: 'success',
-      duration: 3000
     });
   }
 })
