@@ -1,0 +1,8 @@
+.text-more{
+  margin: 0 auto;
+  margin-top: 10px; 
+  text-align: center; 
+}
+.text-style{
+  color:orange;
+}

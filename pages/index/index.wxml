@@ -25,58 +25,63 @@
   <view wx:else>
     <view class="page__hd">
       <view>
-        <view class="page__title" bindtap="getSystemInfo" bind>
-          <text style="color:orange">Plan N</text>
-        </view>
-        <view wx:if="{{appliedPlan}}" class="page__desc">当前已激活计划:{{appliedPlan.planName}}</view>
-        <view wx:else class="page__desc">当前未激活计划</view>
-        <view class="page__desc">点击可将项目标记为今天已完成</view>
-      </view>
-    </view>
-    <view class="page__bd page__bd_spacing">
-      <view class="weui-cells weui-cells_after-title">
-        <view wx:if="{{!appliedPlan}}">
-          <view class="weui-cell weui-cell_access">
-            <view class="weui-cell__bd">
-              未激活计划
-              <text class='dialog-close' decode='true'>&gt;</text> ﹏
-              <text class='dialog-close' decode='true'>&lt;</text>
-            </view>
-            <view class="weui-cell__ft">
-              点击去激活 →_→
-            </view>
-          </view>
-        </view>
-        <view wx:else>
-          <view wx:if="{{!appliedPlanDeail}}">
-            <view class="weui-cell weui-cell_access">
-              <view class="weui-cell__bd">
-                计划项为空
-                <text class='dialog-close' decode='true'>&gt;</text> ﹏
-                <text class='dialog-close' decode='true'>&lt;</text>
-              </view>
-              <view class="weui-cell__ft">
-                点击去添加 →_→
-              </view>
-            </view>
+        <view class="page__title">
+          <view wx:if="{{appliedPlan}}">
+            <text style="color:orange">{{appliedPlan.planName}}</text>
+            <view class="page__desc">点击可更改计划项状态</view>
           </view>
           <view wx:else>
-            <block wx:for="{{appliedPlanDeail}}" wx:for-item="planItem" wx:key="number" wx:for-index="idx" ex:key="number">
-              <view class="weui-cell weui-cell_access" bindtap="popConfirmFinished" data-idx="{{idx}}">
-                <view class="weui-cell__bd">{{planItem.description}}</view>
-                <icon wx:if="{{planItem.finished}}" class="weui-icon-radio" type="success_no_circle" size="16"></icon>
-                <!-- <view class="weui-cell__ft">{{planItem.number}}</view> -->
+            <text style="color:green">未激活计划</text>
+            <view class="page__desc" style="color:orange">
+              <text class='dialog-close' decode='true'>&nbsp;&gt;</text> ﹏
+              <text class='dialog-close' decode='true'>&lt;</text>
               </view>
-            </block>
+          </view>
+          <!-- <text style="color:orange">日历告诉你今天要做什么</text>
+              <text style="color:orange">我来告诉你每天该做什么</text> -->
+            </view>
+          </view>
+        </view>
+        <view class="page__bd page__bd_spacing">
+          <view class="weui-cells weui-cells_after-title">
+            <view wx:if="{{!appliedPlan}}">
+              <view class="weui-cell weui-cell_access" bindtap="dircetToMy">
+                <view class="weui-cell__bd">
+                  点击去激活
+                </view>
+                <view class="weui-cell__ft">
+                   → → →
+                </view>
+              </view>
+            </view>
+            <view wx:else>
+              <view wx:if="{{!appliedPlanDeail}}">
+                <view class="weui-cell weui-cell_access" bindtap="addPlanItem">
+                  <view class="weui-cell__bd">
+                    添加计划项
+                  </view>
+                  <view class="weui-cell__ft">
+                    → → →
+                  </view>
+                </view>
+              </view>
+              <view wx:else>
+                <block wx:for="{{appliedPlanDeail}}" wx:for-item="planItem" wx:key="number" wx:for-index="idx" ex:key="number">
+                  <view class="weui-cell weui-cell_access" bindtap="setFinished" data-idx="{{idx}}">
+                    <view class="weui-cell__bd">{{planItem.description}}</view>
+                    <icon wx:if="{{planItem.finished}}" class="weui-icon-radio" type="success_no_circle" size="16"></icon>
+                    <!-- <view class="weui-cell__ft">{{planItem.number}}</view> -->
+                  </view>
+                </block>
+              </view>
+            </view>
+          </view>
+          <view class="button-sp-area">
+            <button class="weui-btn" type="primary" plain="true" bindtap="getSystemInfo" bindlongtap="popRemind">踢一下
+              <text style="color:orange">TA</text>
+            </button>
+            <button class="weui-btn" type="primary" size="mini">test</button>
           </view>
         </view>
       </view>
-      <view class="button-sp-area">
-        <button class="weui-btn" type="primary" plain="true" bindtap="getSystemInfo" bindlongtap="popRemind">踢一下
-          <text style="color:orange">TA</text>
-        </button>
-        <button class="weui-btn" type="primary" size="mini">test</button>
-      </view>
     </view>
-  </view>
-</view>

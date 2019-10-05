@@ -2,7 +2,8 @@
   "pages": [
     "pages/index/index",
     "pages/logs/logs",
-    "pages/my/my"
+    "pages/my/my",
+    "pages/plan_detail/plan_detail"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -16,11 +17,11 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "首页"
+        "text": "Plan"
       },
       {
         "pagePath":"pages/my/my",
-        "text": "我的"
+        "text": "My"
       }
     ]
   }

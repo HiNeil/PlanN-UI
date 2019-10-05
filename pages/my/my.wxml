@@ -13,20 +13,8 @@
     <view class="page__bd page__bd_spacing" style="padding-bottom:0px">
       <view class="weui-cells__title">我的计划列表</view>
       <view class="weui-cells weui-cells_after-title">
-        <view wx:if="{{plans.length==0}}">
-          <view class="weui-cell weui-cell_access">
-            <view class="weui-cell__bd">
-              还没有计划
-              <text class='dialog-close' decode='true'>&gt;</text> ﹏
-              <text class='dialog-close' decode='true'>&lt;</text>
-            </view>
-            <view class="weui-cell__ft">
-              点击创建 →_→
-            </view>
-          </view>
-        </view>
-        <view wx:else>
-          <block wx:for="{{plans}}" wx:for-item="plan" wx:key="id" wx:for-index="idx" wx:if="{{idx<6}}">
+        <view wx:if="{{plans!=null && plans.length > 0}}">
+          <block wx:for="{{plans}}" wx:for-item="plan" wx:key="id" wx:for-index="idx">
             <view class="weui-cell weui-cell_access" bindtap="activePlan" data-idx="{{idx}}">
               <view class="weui-cell__bd">{{plan.planName}}</view>
               <icon wx:if="{{plan.appled}}" class="weui-icon-radio" type="success" size="23"></icon>
@@ -35,8 +23,8 @@
           </block>
         </view>
       </view>
-      <view class="text-more" wx:if="{{plans.length>4}}">
-        <text class="text-style">更多计划</text>
+      <view class="text-more" bindtap="addPlan">
+        <text class="text-style">新增计划</text>
       </view>
       <view class="weui-cells__title">好友列表</view>
       <view class="weui-cells weui-cells_after-title">
@@ -68,5 +56,8 @@
     </view>
   </view>
 
+  <modal id="addModal" confirm-text="提交" cancel-text="取消" confirm-type="222" hidden="{{addModelHide}}" bindconfirm="newToserver" bindcancel="hideAddPlan">
+    <input type="text" value="{{inputedPlan}}" placeholder="请输入计划名称" maxlength="20" focus="true" bindblur="getInputPlan" bindinput="getInputPlan" bindconfirm="getInputPlan" />
+  </modal>
 
 </view>

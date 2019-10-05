@@ -52,6 +52,8 @@ App({
     userInfo: null,
     openId: null,
     userId: null,
+    currentDetailPlan: null,
+    currentPlanEditId: null,
     host: "https://techedge.top:444"
   }
 })

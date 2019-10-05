@@ -105,6 +105,13 @@ Page({
       }
     })
   },
+  addPlanItem:function(){
+    app.globalData.currentDetailPlan=this.data.appliedPlan;
+    console.log("ddd");
+    wx.navigateTo({
+      url: '../plan_detail/plan_detail'
+    })
+  },
   //用户点击获取用户信息触发
   clickGetUserInfo: function (e) {
     if (e.detail.userInfo) {
@@ -141,7 +148,8 @@ Page({
       this.getUserAppliedPlan(this.data.userId);
   },
   //设置完成或者取消完成
-  setFinished: function (index) {
+  setFinished: function (e) {
+    var index = e.currentTarget.dataset.idx;
     var itemId = this.data.appliedPlanDeail[index].id
     var planId = this.data.appliedPlan.id
     var currentFinished = this.data.appliedPlanDeail[index].finished
@@ -161,28 +169,43 @@ Page({
         that.setData({
           [item]: nextFinished
         });
+        var desc = nextFinished? "已完成":"未完成";
+        that.showSuccessToast(desc);
         console.log(res.data);
       }
     })
   },
-  popConfirmFinished: function (e) {
-    var change = this.setFinished;
-    var index = e.currentTarget.dataset.idx;
-    var currentFinished = this.data.appliedPlanDeail[index].finished
-    wx.showModal({
-      // title: '',
-      content: currentFinished ? '今天未完成该项目？' : '今天已完成该项目？',
-      confirmText: "确定",
-      cancelText: "取消",
-      success: function (res) {
-        if (res.confirm) {
-          change(index);
-          console.log('用户点击确认操作');
-        } else {
-          console.log('用户点击取消操作');
-        }
-      }
+  showSuccessToast: function (desc) {
+    wx.showToast({
+      title: desc,
+      icon: 'success',
+      duration: 1000
     });
+  },
+  // popConfirmFinished: function (e) {
+  //   var change = this.setFinished;
+  //   var index = e.currentTarget.dataset.idx;
+  //   var currentFinished = this.data.appliedPlanDeail[index].finished
+  //   wx.showModal({
+  //     // title: '',
+  //     content: currentFinished ? '今天未完成该项目？' : '今天已完成该项目？',
+  //     confirmText: "确定",
+  //     cancelText: "取消",
+  //     success: function (res) {
+  //       if (res.confirm) {
+  //         change(index);
+  //         console.log('用户点击确认操作');
+  //       } else {
+  //         console.log('用户点击取消操作');
+  //       }
+  //     }
+  //   });
+  // },
+  dircetToMy:function(){
+    wx.switchTab({
+      url: '../my/my',
+    })
+
   },
   popRemind: function () {
     var remindInfo = this.data.remindInfo

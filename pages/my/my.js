@@ -9,6 +9,8 @@ Page({
     userInfo: null,
     userId: null,
     plans: null,
+    addModelHide: true,
+    inputedPlan: null,
     reminds: [{
       id: 1,
       info: 'ainiyo1',
@@ -36,7 +38,6 @@ Page({
     }
     ]
   },
-
   /**
    * 生命周期函数--监听页面加载
    */
@@ -87,7 +88,7 @@ Page({
     var currentApplied = that.data.plans[index].appled;
     var userId = that.data.userId;
     wx.showActionSheet({
-      itemList: currentApplied ? ['查看计划', '取消计划'] : ['查看计划', '激活计划'],
+      itemList: currentApplied ? ['查看计划', '取消计划'] : ['查看计划', '激活计划', "删除计划"],
       success: function (res) {
         if (res.tapIndex == 1 && currentApplied) {
           that.setApplied(index);
@@ -112,8 +113,108 @@ Page({
             }
           });
         } else if (res.tapIndex == 0) {
+          app.globalData.currentDetailPlan = that.data.plans[index]
+          wx.navigateTo({
+            url: '../plan_detail/plan_detail',
+          });
           console.log("跳转到详情页");
+        } else if (res.tapIndex == 2) {
+          wx.request({
+            url: app.globalData.host + "/plan/plan-change/delete/" + userId + "/" + planId,
+            method: "DELETE",
+            success: res => {
+              var deletedPlans = that.data.plans.filter((ele, idx) => {
+                return idx != index
+              });
+              that.setData({
+                plans: deletedPlans
+              });
+              that.showSuccessToast("删除成功");
+            }
+          });
         }
+      }
+    });
+  },
+  /**
+   * 更多计划相关
+   */
+  addPlan: function () {
+    var plans = this.data.plans ? this.data.plans : [];
+    if (plans.length >= 10) {
+      wx.showModal({
+        showTitle: false,
+        content: '超出数量限制，请删除后再添加',
+        showCancel: false,
+        confirmText: '确定',
+        success: function (res) {
+          if (res.confirm) {
+            console.log('用户点击了“确定”')
+          }
+        }
+      })
+    } else {
+      this.showAddPlan();
+    }
+  },
+  hideAddPlan: function () {
+    this.setData({
+      addModelHide: true,
+      inputedPlan: null,
+    })
+  },
+  showAddPlan: function () {
+    this.setData({
+      addModelHide: false,
+    })
+  },
+  getInputPlan: function (e) {
+    this.setData({
+      inputedPlan: e.detail.value.trim()
+    });
+  },
+  showSuccessToast: function (desc) {
+    wx.showToast({
+      title: desc,
+      icon: 'success',
+      duration: 1000
+    });
+  },
+  newToserver: function () {
+    var that = this;
+    var userId = that.data.userId;
+    var des = that.data.inputedPlan;
+    if (des == null || des.length == 0) {
+      that.showSuccessToast("请输入");
+      return
+    }
+    that.hideAddPlan();
+    wx.request({
+      url: app.globalData.host + "/plan/plan-change/add/" + userId,
+      method: "POST",
+      data: {
+        planName: des,
+        applied: 0,
+        type: 0
+      },
+      header: {
+        'content-type': 'application/json' // 默认值
+      },
+      success: function (res) {
+        console.log("inserted: " + res.data);
+        var plans = that.data.plans ? that.data.plans : []
+        plans.push({
+          id: res.data.id,
+          userId: res.data.userId,
+          planName: res.data.planName,
+          appled: res.data.appled,
+          number: res.data.number,
+          appled: res.data.appled,
+        });
+        that.setData({
+          plans: plans
+        });
+        that.showSuccessToast("添加成功");
       }
     });
   },
