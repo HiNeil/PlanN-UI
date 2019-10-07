@@ -4,7 +4,7 @@
 
   <view class="page__hd">
     <view>
-      <view class="page__title" bindtap="getSystemInfo">
+      <view class="page__title" bindtap="showEditPlan">
         <text style="color:orange">{{plan.planName}}</text>
       </view>
       <view class="page__desc">点击编辑</view>
@@ -26,7 +26,7 @@
     <view class="text-more">
       <text class="text-style" bindtap="showAddItem">点击新增</text>
     </view>
-    <view class="weui-cells__title">通知时间</view>
+    <view class="weui-cells__title">提醒时间</view>
     <view class="weui-cells weui-cells_after-title">
       <block wx:for="{{appliedPlanDeail}}" wx:for-item="planItem" wx:key="number" wx:for-index="idx" ex:key="number">
         <view class="weui-cell weui-cell_access" bindtap="popConfirmFinished" data-idx="{{idx}}">
@@ -44,6 +44,10 @@
 
     <modal id="editModal" confirm-text="提交" cancel-text="取消" confirm-type="222" hidden="{{editModelHide}}" bindconfirm="editToserver" bindcancel="hideEditItem">
       <input type="text" value="{{editedItem.description}}" placeholder="请输入计划项描述" maxlength="20" focus="true" bindblur="getEditItem" bindinput="getEditItem" bindconfirm="getEditItem" />
+    </modal>
+
+    <modal id="editPlanModal" confirm-text="提交" cancel-text="取消" confirm-type="222" hidden="{{editPlanModelHide}}" bindconfirm="editPlanToserver" bindcancel="hideEditPlan">
+      <input type="text" value="{{inputedPlan}}" placeholder="请输入计划名称" maxlength="20" focus="true" bindblur="getEditPlan" bindinput="getEditPlan" bindconfirm="getEditPlan" />
     </modal>
 
 

@@ -11,7 +11,7 @@
       </view>
     </view>
     <view class="page__bd page__bd_spacing" style="padding-bottom:0px">
-      <view class="weui-cells__title">我的计划列表</view>
+      <view class="weui-cells__title">计划列表</view>
       <view class="weui-cells weui-cells_after-title">
         <view wx:if="{{plans!=null && plans.length > 0}}">
           <block wx:for="{{plans}}" wx:for-item="plan" wx:key="id" wx:for-index="idx">
@@ -26,7 +26,7 @@
       <view class="text-more" bindtap="addPlan">
         <text class="text-style">新增计划</text>
       </view>
-      <view class="weui-cells__title">好友列表</view>
+      <view class="weui-cells__title">关注列表</view>
       <view class="weui-cells weui-cells_after-title">
         <view wx:if="{{reminds.length==0}}">
           <view class="weui-cell weui-cell_access">

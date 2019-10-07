@@ -157,6 +157,16 @@ Page({
       this.showAddPlan();
     }
   },
+  showSuccessToast: function (desc) {
+    wx.showToast({
+      title: desc,
+      icon: 'success',
+      duration: 1000
+    });
+  },
+  /**
+   * 新增plan相关
+   */
   hideAddPlan: function () {
     this.setData({
       addModelHide: true,
@@ -171,13 +181,6 @@ Page({
   getInputPlan: function (e) {
     this.setData({
       inputedPlan: e.detail.value.trim()
-    });
-  },
-  showSuccessToast: function (desc) {
-    wx.showToast({
-      title: desc,
-      icon: 'success',
-      duration: 1000
     });
   },
   newToserver: function () {

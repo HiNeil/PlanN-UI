@@ -11,6 +11,8 @@ Page({
     editModelHide: true,
     editedItem: null,
     editIndex: null,
+    editPlanModelHide: true,
+    inputedPlan: null
   },
   onLoad: function () {
     this.setData({
@@ -50,24 +52,14 @@ Page({
       editModelHide: true,
       editedItem: null,
       editIndex: null,
+      editPlanModelHide: true,
+      inputedPlan: null
     });
     app.globalData.currentDetailPlan = null;
     console.log("plan:")
     console.log(this.data.plan)
   },
-  getInputItem: function (e) {
-    this.setData({
-      inputedItem: e.detail.value.trim()
-    });
-    console.log(this.data.inputedItem);
-  },
-  getEditItem: function (e) {
-    var itemDesc = "editedItem.description";
-    this.setData({
-      [itemDesc]: e.detail.value.trim()
-    });
-    this.data.editedItem.description = e.detail.value.trim();
-  },
+
   showSuccessToast: function (desc) {
     wx.showToast({
       title: desc,
@@ -75,19 +67,19 @@ Page({
       duration: 1000
     });
   },
-  showAddItem: function () {
+  /**
+   * 编辑plan item 相关
+   */
+  getEditItem: function (e) {
+    var itemDesc = "editedItem.description";
     this.setData({
-      addModelHide: false
-    })
+      [itemDesc]: e.detail.value.trim()
+    });
   },
-  hideAddItem: function () {
+  showEditItem: function (index) {
+    var item = this.data.planDetail[index]
     this.setData({
-      addModelHide: true,
-      inputedItem: null
-    })
-  },
-  showEditItem: function () {
-    this.setData({
+      editedItem: item,
       editModelHide: false
     })
   },
@@ -110,11 +102,7 @@ Page({
       itemList: ['修改', '删除'],
       success: function (res) {
         if (res.tapIndex == 0) {
-          var item = that.data.planDetail[index]
-          that.setData({
-            editedItem: item
-          })
-          that.showEditItem();
+          that.showEditItem(index);
         } else if (res.tapIndex == 1) {
           var planId = that.data.plan.id;
           var itemId = that.data.planDetail[index].id
@@ -135,6 +123,56 @@ Page({
           });
         }
       }
+    })
+  },
+  editToserver: function () {
+    var that = this;
+    var planId = that.data.plan.id;
+    var item = that.data.editedItem;
+    if (item.description == null || item.description.length == 0) {
+      that.showSuccessToast("请输入");
+      return
+    }
+    that.hideEditItem();
+    wx.request({
+      url: app.globalData.host + "/plan/plan-item-change/modify/" + planId + "/" + item.id,
+      method: "PUT",
+      data: {
+        description: item.description
+      },
+      header: {
+        'content-type': 'application/json' // 默认值
+      },
+      success: function (res) {
+        console.log("edited: " + res.data);
+        var index = that.data.editIndex;
+        var itemDesc = "planDetail[" + index + "].description";
+        that.setData({
+          [itemDesc]: item.description
+        });
+        that.showSuccessToast("修改成功");
+      }
+    });
+  },
+  /**
+   * 新增plan item 相关
+   */
+  getInputItem: function (e) {
+    this.setData({
+      inputedItem: e.detail.value.trim()
+    });
+    console.log(this.data.inputedItem);
+  },
+  showAddItem: function () {
+    this.setData({
+      addModelHide: false,
+      inputedItem: null
+    })
+  },
+  hideAddItem: function () {
+    this.setData({
+      addModelHide: true,
+      inputedItem: null
     })
   },
   newToserver: function () {
@@ -173,30 +211,51 @@ Page({
       }
     });
   },
-  editToserver: function () {
+  /**
+   * 编辑plan相关
+   */
+  showEditPlan: function () {
+    var currentPlanName = this.data.plan.planName;
+    this.setData({
+      editPlanModelHide: false,
+      inputedPlan: currentPlanName
+    })
+  },
+  hideEditPlan: function () {
+    this.setData({
+      editPlanModelHide: true,
+      inputedPlan: null
+    })
+  },
+  getEditPlan: function (e) {
+    this.setData({
+      inputedPlan: e.detail.value.trim()
+    })
+  },
+  editPlanToserver: function () {
     var that = this;
     var planId = that.data.plan.id;
-    var item = that.data.editedItem;
-    if (item.description == null || item.description.length == 0) {
+    var userId = that.data.userId;
+    var newPlanName = that.data.inputedPlan;
+    if (newPlanName == null || newPlanName.length == 0) {
       that.showSuccessToast("请输入");
       return
     }
-    that.hideEditItem();
+    that.hideEditPlan();
     wx.request({
-      url: app.globalData.host + "/plan/plan-item-change/modify/" + planId + "/" + item.id,
+      url: app.globalData.host + "/plan/plan-change/modify/" + userId + "/" + planId,
       method: "PUT",
       data: {
-        description: item.description
+        planName: newPlanName
       },
       header: {
         'content-type': 'application/json' // 默认值
       },
       success: function (res) {
-        console.log("edited: " + res.data);
-        var index = that.data.editIndex;
-        var itemDesc = "planDetail[" + index + "].description";
+        console.log("edited plan: " + res.data);
+        var newPlan = "plan.planName";
         that.setData({
-          [itemDesc]: item.description
+          [newPlan]: newPlanName
         });
         that.showSuccessToast("修改成功");
       }
