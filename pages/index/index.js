@@ -71,7 +71,7 @@ Page({
   getPlanDetail: function (id) {
     var that = this;
     wx.request({
-      url: app.globalData.host + "/plan/plan-info/detail/" + id,
+      url: app.globalData.host + "/plan/plan-info/detail/" + id + "?offSet=" + 8,
       success: res => {
         if (res.data.length > 0) {
           that.setData({
@@ -107,7 +107,6 @@ Page({
   },
   addPlanItem:function(){
     app.globalData.currentDetailPlan=this.data.appliedPlan;
-    console.log("ddd");
     wx.navigateTo({
       url: '../plan_detail/plan_detail'
     })
@@ -117,8 +116,6 @@ Page({
     if (e.detail.userInfo) {
       //用户按了允许授权按钮
       var that = this;
-      //插入登录的用户的相关信息到数据库
-      this.getUserInfoFromServer(this.getUserAppliedPlan);
       //设置用户信息为全局变量
       console.log("login user Info " + e.detail.userInfo.nickName)
       app.globalData.userInfo = e.detail.userInfo
@@ -182,30 +179,10 @@ Page({
       duration: 1000
     });
   },
-  // popConfirmFinished: function (e) {
-  //   var change = this.setFinished;
-  //   var index = e.currentTarget.dataset.idx;
-  //   var currentFinished = this.data.appliedPlanDeail[index].finished
-  //   wx.showModal({
-  //     // title: '',
-  //     content: currentFinished ? '今天未完成该项目？' : '今天已完成该项目？',
-  //     confirmText: "确定",
-  //     cancelText: "取消",
-  //     success: function (res) {
-  //       if (res.confirm) {
-  //         change(index);
-  //         console.log('用户点击确认操作');
-  //       } else {
-  //         console.log('用户点击取消操作');
-  //       }
-  //     }
-  //   });
-  // },
   dircetToMy:function(){
     wx.switchTab({
       url: '../my/my',
     })
-
   },
   popRemind: function () {
     var remindInfo = this.data.remindInfo

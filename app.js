@@ -6,15 +6,14 @@ App({
     // logs.unshift(Date.now())
     // logs.unshift(new Date(1989, 11, 17, 12, 28, 45, 30))
     // wx.setStorageSync('logs', logs)
-
+    //获取userId
+    if (!this.globalData.userId) {
+      this.getUserInfoFromServer();
+    }
     // 获取用户信息
     wx.getSetting({
       success: res => {
         if (res.authSetting['scope.userInfo']) {
-          //已经授权，像Server请求用户信息
-          if (!this.globalData.userId) {
-            this.getUserInfoFromServer();
-          }
           // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
           wx.getUserInfo({
             success: res => {

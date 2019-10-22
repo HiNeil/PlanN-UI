@@ -50,7 +50,7 @@
                   点击去激活
                 </view>
                 <view class="weui-cell__ft">
-                   → → →
+                   → _ →
                 </view>
               </view>
             </view>
@@ -80,7 +80,7 @@
             <button class="weui-btn" type="primary" plain="true" bindtap="getSystemInfo" bindlongtap="popRemind">踢一下
               <text style="color:orange">TA</text>
             </button>
-            <button class="weui-btn" type="primary" size="mini">test</button>
+            <button class="weui-btn" type="primary" size="mini" bindtap="sendMessage">test</button>
           </view>
         </view>
       </view>

@@ -14,11 +14,11 @@
     <view class="weui-cells__title">计划项</view>
     <view class="weui-cells weui-cells_after-title">
       <view wx:if="{{planDetail!=null && planDetail.length>0}}">
-        <block wx:for="{{planDetail}}" wx:for-item="planItem" wx:key="number" wx:for-index="idx" ex:key="number">
+        <block wx:for="{{planDetail}}" wx:for-item="planItem" wx:key="id" wx:for-index="idx" ex:key="number">
           <view class="weui-cell weui-cell_access" bindtap="editItem" data-idx="{{idx}}">
-            <view class="weui-cell__bd">{{planItem.description}}</view>
-            <!-- <icon wx:if="{{planItem.finished}}" class="weui-icon-radio" type="success_no_circle" size="16"></icon> -->
-            <!-- <view class="weui-cell__ft">{{planItem.number}}</view> -->
+            <view class="weui-cell__bd">
+              {{planItem.description}}
+            </view>
           </view>
         </block>
       </view>
@@ -26,38 +26,36 @@
     <view class="text-more">
       <text class="text-style" bindtap="showAddItem">点击新增</text>
     </view>
+
     <view class="weui-cells__title">提醒时间</view>
     <view class="weui-cells weui-cells_after-title">
-      <block wx:for="{{appliedPlanDeail}}" wx:for-item="planItem" wx:key="number" wx:for-index="idx" ex:key="number">
-        <view class="weui-cell weui-cell_access" bindtap="popConfirmFinished" data-idx="{{idx}}">
-          <view class="weui-cell__bd">{{planItem.description}}</view>
-          <icon wx:if="{{planItem.finished}}" class="weui-icon-radio" type="success_no_circle" size="16"></icon>
-          <!-- <view class="weui-cell__ft">{{planItem.number}}</view> -->
-        </view>
-      </block>
+      <view wx:if="{{noticeDetail!=null && noticeDetail.length>0}}">
+        <block wx:for="{{noticeDetail}}" wx:for-item="noticeItem" wx:key="id" wx:for-index="idx">
+          <view class="weui-cell weui-cell_access" bindtap="editTime" data-idx="{{idx}}">
+            <view class="weui-cell__bd">
+              {{noticeItem.noticeTime.hour+':'+noticeItem.noticeTime.minute}}
+            </view>
+          </view>
+        </block>
+      </view>
     </view>
-
-
-    <modal id="addModal" confirm-text="提交" cancel-text="取消" confirm-type="222" hidden="{{addModelHide}}" bindconfirm="newToserver" bindcancel="hideAddItem">
-      <input type="text" value="{{inputedItem}}" placeholder="请输入计划项描述" maxlength="20" focus="true" bindblur="getInputItem" bindinput="getInputItem" bindconfirm="getInputItem" />
-    </modal>
-
-    <modal id="editModal" confirm-text="提交" cancel-text="取消" confirm-type="222" hidden="{{editModelHide}}" bindconfirm="editToserver" bindcancel="hideEditItem">
-      <input type="text" value="{{editedItem.description}}" placeholder="请输入计划项描述" maxlength="20" focus="true" bindblur="getEditItem" bindinput="getEditItem" bindconfirm="getEditItem" />
-    </modal>
-
-    <modal id="editPlanModal" confirm-text="提交" cancel-text="取消" confirm-type="222" hidden="{{editPlanModelHide}}" bindconfirm="editPlanToserver" bindcancel="hideEditPlan">
-      <input type="text" value="{{inputedPlan}}" placeholder="请输入计划名称" maxlength="20" focus="true" bindblur="getEditPlan" bindinput="getEditPlan" bindconfirm="getEditPlan" />
-    </modal>
-
-
-
-    <!-- <view class="button-sp-area">
-      <button class="weui-btn" type="primary" plain="true" bindtap="getSystemInfo" bindlongtap="popRemind">踢一下
-        <text style="color:orange">TA</text>
-      </button>
-      <button class="weui-btn" type="primary" size="mini">test</button>
-    </view> -->
+    <picker mode="time" start="00:10" end="23:50" bindchange="timeChange" bindcancel="">
+      <view class="text-more">
+        <text class="text-style">点击新增</text>
+      </view>
+    </picker>
   </view>
+
+  <modal id="addModal" confirm-text="提交" cancel-text="取消" confirm-type="222" hidden="{{addModelHide}}" bindconfirm="newToserver" bindcancel="hideAddItem">
+    <input type="text" value="{{inputedItem}}" placeholder="请输入计划项描述" maxlength="20" focus="true" bindblur="getInputItem" bindinput="getInputItem" bindconfirm="getInputItem" />
+  </modal>
+
+  <modal id="editModal" confirm-text="提交" cancel-text="取消" confirm-type="222" hidden="{{editModelHide}}" bindconfirm="editToserver" bindcancel="hideEditItem">
+    <input type="text" value="{{editedItem.description}}" placeholder="请输入计划项描述" maxlength="20" focus="true" bindblur="getEditItem" bindinput="getEditItem" bindconfirm="getEditItem" />
+  </modal>
+
+  <modal id="editPlanModal" confirm-text="提交" cancel-text="取消" confirm-type="222" hidden="{{editPlanModelHide}}" bindconfirm="editPlanToserver" bindcancel="hideEditPlan">
+    <input type="text" value="{{inputedPlan}}" placeholder="请输入计划名称" maxlength="20" focus="true" bindblur="getEditPlan" bindinput="getEditPlan" bindconfirm="getEditPlan" />
+  </modal>
 
 </view>

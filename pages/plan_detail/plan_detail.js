@@ -3,6 +3,7 @@ const app = getApp();
 Page({
   data: {
     planDetail: null,
+    noticeDetail: null,
     plan: null,
     userId: null,
     noticeTime: null,
@@ -20,14 +21,27 @@ Page({
     })
   },
   onShow: function () {
+    /**
+     * 如果userId 或者 currentDetailPlan 为空的话 就跳回首页
+     */
+    if (this.data.userId == null || app.globalData.currentDetailPlan == null) {
+      wx.switchTab({
+        url: '../index/index',
+      })
+    };
     this.setData({
       plan: app.globalData.currentDetailPlan
     });
     console.log(this.data.plan);
     var that = this;
     var planId = that.data.plan.id;
+    that.getPlanDetail(planId);
+    that.getNoticeDetail(planId);
+  },
+  getPlanDetail: function (planId) {
+    var that = this;
     wx.request({
-      url: app.globalData.host + "/plan/plan-info/detail/" + planId,
+      url: app.globalData.host + "/plan/plan-info/detail/" + planId + "?offSet=" + 8,
       success: res => {
         if (res.data.length > 0) {
           that.setData({
@@ -37,6 +51,24 @@ Page({
         } else {
           that.setData({
             planDetail: null
+          });
+        }
+      }
+    })
+  },
+  getNoticeDetail: function (planId) {
+    var that = this;
+    wx.request({
+      url: app.globalData.host + "/plan/plan-notice/get/" + planId + "?zoneOffset=8",
+      success: res => {
+        if (res.data.length > 0) {
+          that.setData({
+            noticeDetail: res.data
+          });
+          console.log(that.data.noticeDetail);
+        } else {
+          that.setData({
+            noticeDetail: null
           });
         }
       }
@@ -90,8 +122,8 @@ Page({
     })
   },
   /**
-    * 编辑item弹框
-    */
+   * 编辑item弹框
+   */
   editItem: function (e) {
     var that = this;
     var index = e.currentTarget.dataset.idx;
@@ -99,7 +131,7 @@ Page({
       editIndex: index,
     });
     wx.showActionSheet({
-      itemList: ['修改', '删除'],
+      itemList: ['修改', '删除', '新增'],
       success: function (res) {
         if (res.tapIndex == 0) {
           that.showEditItem(index);
@@ -117,6 +149,39 @@ Page({
               );
               that.setData({
                 planDetail: deletedPlanDetail
+              })
+              that.showSuccessToast("删除成功")
+            }
+          });
+        } else if (res.tapIndex == 2) {
+          that.showAddItem();
+        }
+      }
+    })
+  },
+  /**
+   * 编辑time弹框
+   */
+  editTime: function (e) {
+    var that = this;
+    var index = e.currentTarget.dataset.idx;
+    wx.showActionSheet({
+      itemList: ['删除'],
+      success: function (res) {
+        if (res.tapIndex == 0) {
+          var planId = that.data.plan.id;
+          var timeId = that.data.noticeDetail[index].id
+          wx.request({
+            url: app.globalData.host + "/plan/plan-notice/delete/" + planId + "/" + timeId,
+            method: "DELETE",
+            success: function (e) {
+              var deletedNoticeDetail = that.data.noticeDetail.filter(
+                (ele, idx) => {
+                  return idx != index
+                }
+              );
+              that.setData({
+                noticeDetail: deletedNoticeDetail
               })
               that.showSuccessToast("删除成功")
             }
@@ -258,6 +323,41 @@ Page({
           [newPlan]: newPlanName
         });
         that.showSuccessToast("修改成功");
+      }
+    });
+  },
+  /**
+   * 编辑时间相关
+   */
+  timeChange: function (e) {
+    console.log(e.detail.value)
+    var that = this
+    var time = e.detail.value
+    var planId = that.data.plan.id
+    wx.request({
+      url: app.globalData.host + "/plan/plan-notice/add/" + planId,
+      method: "POST",
+      data: {
+        noticeTime: time,
+        zoneOffset: 8
+      },
+      header: {
+        'content-type': 'application/json' // 默认值
+      },
+      success: function (res) {
+        console.log("inserted: " + res.data);
+        var times = that.data.noticeDetail == null ? [] : that.data.noticeDetail
+        times.push({
+          "id": res.data.id,
+          "noticeTime": res.data.noticeTime,
+          "zoneOffset": res.data.zoneOffset,
+          "planId": res.data.planId,
+          "finished": 0
+        });
+        that.setData({
+          noticeDetail: times
+        });
+        that.showSuccessToast("添加成功");
       }
     });
   }
