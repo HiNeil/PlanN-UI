@@ -57,12 +57,16 @@ Page({
     })
   },
   getUserPlans: function (id) {
+    wx.showLoading({
+      title: '加载中',
+    })
     wx.request({
       url: app.globalData.host + "/plan/plan-info/list/" + id,
       success: res => {
         this.setData({
           plans: res.data
         })
+        wx.hideLoading();
       }
     })
   },
@@ -93,6 +97,7 @@ Page({
         if (res.tapIndex == 1 && currentApplied) {
           that.setApplied(index);
         } else if (res.tapIndex == 1 && !currentApplied) {
+          wx.showLoading();
           wx.request({
             url: app.globalData.host + "/plan/plan-info/list/" + userId,
             success: res => {
@@ -110,6 +115,7 @@ Page({
               } else {
                 that.setApplied(index);
               }
+              wx.hideLoading();
             }
           });
         } else if (res.tapIndex == 0) {
@@ -119,6 +125,7 @@ Page({
           });
           console.log("跳转到详情页");
         } else if (res.tapIndex == 2) {
+          wx.showLoading();
           wx.request({
             url: app.globalData.host + "/plan/plan-change/delete/" + userId + "/" + planId,
             method: "DELETE",
@@ -192,6 +199,7 @@ Page({
       return
     }
     that.hideAddPlan();
+    wx.showLoading();
     wx.request({
       url: app.globalData.host + "/plan/plan-change/add/" + userId,
       method: "POST",
@@ -226,6 +234,7 @@ Page({
     var planId = that.data.plans[index].id;
     var userId = that.data.userId;
     var nextApplied = that.data.plans[index].appled ? 0 : 1;
+    wx.showLoading();
     wx.request({
       url: app.globalData.host + '/plan/plan-change/modify/' + userId + '/' + planId,
       data: {
@@ -240,6 +249,8 @@ Page({
         that.setData({
           [plan]: nextApplied
         });
+        var desc = nextApplied == 0 ? "取消成功" : "激活成功"
+        that.showSuccessToast(desc);
         console.log(res.data);
       }
     })

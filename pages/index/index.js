@@ -10,7 +10,8 @@ Page({
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     remindInfo: "亲爱的，不要忘记吃药！",
     appliedPlan: null,
-    appliedPlanDeail: null
+    appliedPlanDeail: null,
+    offset: (new Date()).getTimezoneOffset()/-60
   },
   onLoad: function () {
     var that = this
@@ -30,7 +31,7 @@ Page({
       });
       that.getUserAppliedPlan(that.data.userId);
     } else {
-      that.getUserInfoFromServer(this.getUserAppliedPlan);
+      that.getUserInfoFromServer();
     };
     if (app.globalData.userInfo) {
       that.setData({
@@ -52,6 +53,9 @@ Page({
   //从服务器获取plans
   getUserAppliedPlan: function (id) {
     var that = this;
+    wx.showLoading({
+      title: '加载中',
+    })
     wx.request({
       url: app.globalData.host + "/plan/plan-info/list/" + id,
       success: res => {
@@ -65,13 +69,17 @@ Page({
             appliedPlan: null
           });
         }
+        wx.hideLoading();
       }
     })
   },
   getPlanDetail: function (id) {
     var that = this;
+    wx.showLoading({
+      title: '加载中',
+    })
     wx.request({
-      url: app.globalData.host + "/plan/plan-info/detail/" + id + "?offSet=" + 8,
+      url: app.globalData.host + "/plan/plan-info/detail/" + id + "?offSet=" + that.data.offset,
       success: res => {
         if (res.data.length > 0) {
           that.setData({
@@ -82,13 +90,17 @@ Page({
             appliedPlanDeail: null
           });
         }
+        wx.hideLoading();
       }
     })
   },
   //从服务器获取用户信息
-  getUserInfoFromServer: function (f) {
+  getUserInfoFromServer: function () {
     var that = this
     // 登录 
+    wx.showLoading({
+      title: '加载中',
+    })
     wx.login({
       success: res => {
         wx.request({
@@ -98,7 +110,8 @@ Page({
             that.setData({
               userId: res.data
             });
-            f(that.data.userId);
+            that.getUserAppliedPlan(that.data.userId);
+            wx.hideLoading();
           }
         })
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
@@ -152,6 +165,7 @@ Page({
     var currentFinished = this.data.appliedPlanDeail[index].finished
     var nextFinished = currentFinished ? 0 : 1;
     var that = this
+    wx.showLoading();
     wx.request({
       url: app.globalData.host + '/plan/plan-item-change/modify/' + planId + '/' + itemId,
       data: {
@@ -168,7 +182,6 @@ Page({
         });
         var desc = nextFinished? "已完成":"未完成";
         that.showSuccessToast(desc);
-        console.log(res.data);
       }
     })
   },

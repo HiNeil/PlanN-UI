@@ -13,7 +13,8 @@ Page({
     editedItem: null,
     editIndex: null,
     editPlanModelHide: true,
-    inputedPlan: null
+    inputedPlan: null,
+    offset: (new Date()).getTimezoneOffset() / -60
   },
   onLoad: function () {
     this.setData({
@@ -40,8 +41,11 @@ Page({
   },
   getPlanDetail: function (planId) {
     var that = this;
+    wx.showLoading({
+      title: '加载中',
+    })
     wx.request({
-      url: app.globalData.host + "/plan/plan-info/detail/" + planId + "?offSet=" + 8,
+      url: app.globalData.host + "/plan/plan-info/detail/" + planId + "?offSet=" + that.data.offset,
       success: res => {
         if (res.data.length > 0) {
           that.setData({
@@ -53,13 +57,17 @@ Page({
             planDetail: null
           });
         }
+        wx.hideLoading();
       }
     })
   },
   getNoticeDetail: function (planId) {
     var that = this;
+    wx.showLoading({
+      title: '加载中',
+    })
     wx.request({
-      url: app.globalData.host + "/plan/plan-notice/get/" + planId + "?zoneOffset=8",
+      url: app.globalData.host + "/plan/plan-notice/get/" + planId + "?zoneOffset=" + that.data.offset,
       success: res => {
         if (res.data.length > 0) {
           that.setData({
@@ -71,6 +79,7 @@ Page({
             noticeDetail: null
           });
         }
+        wx.hideLoading();
       }
     })
   },
@@ -131,13 +140,14 @@ Page({
       editIndex: index,
     });
     wx.showActionSheet({
-      itemList: ['修改', '删除', '新增'],
+      itemList: ['修改', '删除'],
       success: function (res) {
         if (res.tapIndex == 0) {
           that.showEditItem(index);
         } else if (res.tapIndex == 1) {
           var planId = that.data.plan.id;
           var itemId = that.data.planDetail[index].id
+          wx.showLoading();
           wx.request({
             url: app.globalData.host + "/plan/plan-item-change/delete/" + planId + "/" + itemId,
             method: "DELETE",
@@ -150,11 +160,9 @@ Page({
               that.setData({
                 planDetail: deletedPlanDetail
               })
-              that.showSuccessToast("删除成功")
+              that.showSuccessToast("删除成功");
             }
           });
-        } else if (res.tapIndex == 2) {
-          that.showAddItem();
         }
       }
     })
@@ -171,6 +179,7 @@ Page({
         if (res.tapIndex == 0) {
           var planId = that.data.plan.id;
           var timeId = that.data.noticeDetail[index].id
+          wx.showLoading();
           wx.request({
             url: app.globalData.host + "/plan/plan-notice/delete/" + planId + "/" + timeId,
             method: "DELETE",
@@ -199,6 +208,7 @@ Page({
       return
     }
     that.hideEditItem();
+    wx.showLoading();
     wx.request({
       url: app.globalData.host + "/plan/plan-item-change/modify/" + planId + "/" + item.id,
       method: "PUT",
@@ -249,6 +259,7 @@ Page({
       return
     }
     that.hideAddItem();
+    wx.showLoading();
     wx.request({
       url: app.globalData.host + "/plan/plan-item-change/add/" + planId,
       method: "POST",
@@ -307,6 +318,7 @@ Page({
       return
     }
     that.hideEditPlan();
+    wx.showLoading();
     wx.request({
       url: app.globalData.host + "/plan/plan-change/modify/" + userId + "/" + planId,
       method: "PUT",
@@ -334,12 +346,13 @@ Page({
     var that = this
     var time = e.detail.value
     var planId = that.data.plan.id
+    wx.showLoading();
     wx.request({
       url: app.globalData.host + "/plan/plan-notice/add/" + planId,
       method: "POST",
       data: {
         noticeTime: time,
-        zoneOffset: 8
+        zoneOffset: that.data.offset
       },
       header: {
         'content-type': 'application/json' // 默认值
