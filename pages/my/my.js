@@ -38,6 +38,7 @@ Page({
     }
     ]
   },
+
   /**
    * 生命周期函数--监听页面加载
    */
@@ -45,17 +46,32 @@ Page({
     this.initData();
     app.callBackForMy = this.initData;
   },
+
   initData: function () {
     this.setData({
       userInfo: app.globalData.userInfo,
       userId: app.globalData.userId
     });
   },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function () {
+    if (this.data.userInfo && this.data.userId)
+      this.getUserPlans(this.data.userId);
+    else
+      wx.switchTab({
+        url: '../index/index',
+      });
+  },
+
   cleanData: function () {
     this.setData({
       plans: null
     })
   },
+
   getUserPlans: function (id) {
     wx.showLoading({
       title: '加载中',
@@ -66,16 +82,21 @@ Page({
         this.setData({
           plans: res.data
         })
+      },
+      fail: res => {
+
+      },
+      complete: res => {
         wx.hideLoading();
       }
     })
   },
+
   //如果用户信息数据不存在跳转到的主页进行登录操作
   setLoginCallBack: function () {
-    if (app.globalData.userInfo) {
+    if (app.globalData.userInfo && app.globalData.userId) {
       this.initData();
-      if (this.data.userId)
-        this.getUserPlans(this.data.userId);
+      this.getUserPlans(this.data.userId);
     } else {
       wx.switchTab({
         url: '../index/index',
@@ -115,7 +136,12 @@ Page({
               } else {
                 that.setApplied(index);
               }
-              wx.hideLoading();
+            },
+            fail: res => {
+
+            },
+            complete: res => {
+
             }
           });
         } else if (res.tapIndex == 0) {
@@ -137,6 +163,12 @@ Page({
                 plans: deletedPlans
               });
               that.showSuccessToast("删除成功");
+            },
+            fail: res => {
+
+            },
+            complete: res => {
+
             }
           });
         }
@@ -226,6 +258,12 @@ Page({
           plans: plans
         });
         that.showSuccessToast("添加成功");
+      },
+      fail: res => {
+
+      },
+      complete: res => {
+
       }
     });
   },
@@ -252,11 +290,14 @@ Page({
         var desc = nextApplied == 0 ? "取消成功" : "激活成功"
         that.showSuccessToast(desc);
         console.log(res.data);
+      },
+      fail: res => {
+
+      },
+      complete: res => {
+        
       }
     })
-
-
-
   },
   activeRemind: function () {
     wx.showActionSheet({
@@ -276,19 +317,6 @@ Page({
 
     console.log("页面->刷新完毕")
 
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-    if (!this.data.userInfo)
-      wx.switchTab({
-        url: '../index/index',
-      });
-    if (this.data.userId)
-      this.getUserPlans(this.data.userId);
-    console.log("页面->显示了");
   },
 
   /**

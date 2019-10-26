@@ -22,19 +22,18 @@ Page({
     })
   },
   onShow: function () {
+    var that = this;
     /**
      * 如果userId 或者 currentDetailPlan 为空的话 就跳回首页
      */
-    if (this.data.userId == null || app.globalData.currentDetailPlan == null) {
+    if (that.data.userId == null || app.globalData.currentDetailPlan == null) {
       wx.switchTab({
-        url: '../index/index',
+        url: '../my/my',
       })
     };
-    this.setData({
+    that.setData({
       plan: app.globalData.currentDetailPlan
     });
-    console.log(this.data.plan);
-    var that = this;
     var planId = that.data.plan.id;
     that.getPlanDetail(planId);
     that.getNoticeDetail(planId);
@@ -51,12 +50,16 @@ Page({
           that.setData({
             planDetail: res.data
           });
-          console.log(that.data.planDetail);
         } else {
           that.setData({
             planDetail: null
           });
         }
+      },
+      fail: res => {
+
+      },
+      complete: res => {
         wx.hideLoading();
       }
     })
@@ -73,12 +76,16 @@ Page({
           that.setData({
             noticeDetail: res.data
           });
-          console.log(that.data.noticeDetail);
         } else {
           that.setData({
             noticeDetail: null
           });
         }
+      },
+      fail: res => {
+
+      },
+      complete: res => {
         wx.hideLoading();
       }
     })
@@ -97,8 +104,6 @@ Page({
       inputedPlan: null
     });
     app.globalData.currentDetailPlan = null;
-    console.log("plan:")
-    console.log(this.data.plan)
   },
 
   showSuccessToast: function (desc) {
@@ -161,6 +166,12 @@ Page({
                 planDetail: deletedPlanDetail
               })
               that.showSuccessToast("删除成功");
+            },
+            fail: res => {
+
+            },
+            complete: res => {
+              
             }
           });
         }
@@ -193,6 +204,12 @@ Page({
                 noticeDetail: deletedNoticeDetail
               })
               that.showSuccessToast("删除成功")
+            },
+            fail: res => {
+
+            },
+            complete: res => {
+              
             }
           });
         }
@@ -226,6 +243,12 @@ Page({
           [itemDesc]: item.description
         });
         that.showSuccessToast("修改成功");
+      },
+      fail: res => {
+
+      },
+      complete: res => {
+        
       }
     });
   },
@@ -284,6 +307,12 @@ Page({
           planDetail: planItems
         });
         that.showSuccessToast("添加成功");
+      },
+      fail: res => {
+
+      },
+      complete: res => {
+
       }
     });
   },
@@ -335,6 +364,12 @@ Page({
           [newPlan]: newPlanName
         });
         that.showSuccessToast("修改成功");
+      },
+      fail: res => {
+
+      },
+      complete: res => {
+        
       }
     });
   },
@@ -371,6 +406,12 @@ Page({
           noticeDetail: times
         });
         that.showSuccessToast("添加成功");
+      },
+      fail: res => {
+
+      },
+      complete: res => {
+        
       }
     });
   }

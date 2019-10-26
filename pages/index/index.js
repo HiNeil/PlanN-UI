@@ -8,10 +8,10 @@ Page({
     userInfo: null,
     userInfoAuthorized: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    remindInfo: "亲爱的，不要忘记吃药！",
+    remindInfo: "踢一下功能紧急开发中...",
     appliedPlan: null,
     appliedPlanDeail: null,
-    offset: (new Date()).getTimezoneOffset()/-60
+    offset: (new Date()).getTimezoneOffset() / -60
   },
   onLoad: function () {
     var that = this
@@ -24,15 +24,6 @@ Page({
         }
       }
     });
-    //如果有userId 就设置给当前页面的userId,如果没有就重新获取
-    if (app.globalData.userId) {
-      that.setData({
-        userId: app.globalData.userId
-      });
-      that.getUserAppliedPlan(that.data.userId);
-    } else {
-      that.getUserInfoFromServer();
-    };
     if (app.globalData.userInfo) {
       that.setData({
         userInfo: app.globalData.userInfo,
@@ -49,6 +40,19 @@ Page({
         });
       };
     };
+    //如果有userId 就设置给当前页面的userId,如果没有就重新获取
+    if (app.globalData.userId) {
+      that.setData({
+        userId: app.globalData.userId
+      });
+    }
+  },
+  onShow: function () {
+    var that = this;
+    if (that.data.userId)
+      that.getUserAppliedPlan(that.data.userId);
+    else
+      that.getUserInfoFromServer();
   },
   //从服务器获取plans
   getUserAppliedPlan: function (id) {
@@ -69,6 +73,11 @@ Page({
             appliedPlan: null
           });
         }
+      },
+      fail: res => {
+
+      },
+      complete: res => {
         wx.hideLoading();
       }
     })
@@ -90,6 +99,11 @@ Page({
             appliedPlanDeail: null
           });
         }
+      },
+      fail: res => {
+
+      },
+      complete: res => {
         wx.hideLoading();
       }
     })
@@ -111,6 +125,11 @@ Page({
               userId: res.data
             });
             that.getUserAppliedPlan(that.data.userId);
+          },
+          fail: res => {
+
+          },
+          complete: res => {
             wx.hideLoading();
           }
         })
@@ -118,8 +137,8 @@ Page({
       }
     })
   },
-  addPlanItem:function(){
-    app.globalData.currentDetailPlan=this.data.appliedPlan;
+  addPlanItem: function () {
+    app.globalData.currentDetailPlan = this.data.appliedPlan;
     wx.navigateTo({
       url: '../plan_detail/plan_detail'
     })
@@ -153,10 +172,6 @@ Page({
       })
     }
   },
-  onShow: function () {
-    if (this.data.userId)
-      this.getUserAppliedPlan(this.data.userId);
-  },
   //设置完成或者取消完成
   setFinished: function (e) {
     var index = e.currentTarget.dataset.idx;
@@ -180,8 +195,14 @@ Page({
         that.setData({
           [item]: nextFinished
         });
-        var desc = nextFinished? "已完成":"未完成";
+        var desc = nextFinished ? "已完成" : "未完成";
         that.showSuccessToast(desc);
+      },
+      fail: res => {
+
+      },
+      complete: res => {
+        
       }
     })
   },
@@ -192,7 +213,7 @@ Page({
       duration: 1000
     });
   },
-  dircetToMy:function(){
+  dircetToMy: function () {
     wx.switchTab({
       url: '../my/my',
     })
@@ -200,10 +221,10 @@ Page({
   popRemind: function () {
     var remindInfo = this.data.remindInfo
     wx.showModal({
-      // title: '',
       content: remindInfo,
       confirmText: "确定",
-      cancelText: "修改",
+      showCancel: false,
+      // cancelText: "修改",
       success: function (res) {
         console.log(res);
         if (res.confirm) {

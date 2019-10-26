@@ -14,7 +14,7 @@
     </view>
     <view wx:else>请升级微信版本</view>
   </view>
-  <view wx:elif="{{!userInfo && !userId}}">
+  <view wx:elif="{{!userInfo}}">
     <view class="page__bd">
       <view class="weui-loadmore">
         <view class="weui-loading"></view>
@@ -61,7 +61,7 @@
                     添加计划项
                   </view>
                   <view class="weui-cell__ft">
-                    → → →
+                    → _ →
                   </view>
                 </view>
               </view>
@@ -77,10 +77,9 @@
             </view>
           </view>
           <view class="button-sp-area">
-            <button class="weui-btn" type="primary" plain="true" bindtap="getSystemInfo" bindlongtap="popRemind">踢一下
+            <button class="weui-btn" type="primary" plain="true" bindtap="popRemind" bindlongtap="popRemind">踢一下
               <text style="color:orange">TA</text>
             </button>
-            <button class="weui-btn" type="primary" size="mini" bindtap="sendMessage">test</button>
           </view>
         </view>
       </view>
