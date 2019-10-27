@@ -41,22 +41,22 @@ Page({
         });
       };
     };
-    that.setData({
-      userId: app.globalData.userId
-    });
-  },
-  onShow: function () {
-    // wx.showNavigationBarLoading();
-    var that = this;
-    //如果有userId 直接获取,如果没有就重新获取
-    if (!that.data.userId)
+    if (app.globalData.userId) {
+      that.setData({
+        userId: app.globalData.userId
+      });
+    } else {
       app.userIdReadyCallBack = userId => {
         that.setData({
           userId: userId
         });
         that.getUserAppliedPlan(that.data.userId);
       }
-    else
+    }
+  },
+  onShow: function () {
+    var that = this;
+    if (that.data.userId)
       that.getUserAppliedPlan(that.data.userId);
   },
   //从服务器获取plans

@@ -14,7 +14,7 @@
     </view>
     <view wx:else>请升级微信版本</view>
   </view>
-  <view wx:elif="{{!userInfo}}">
+  <view wx:elif="{{!userInfo || !userId}}">
     <view class="page__bd">
       <view class="weui-loadmore">
         <view class="weui-loading"></view>
