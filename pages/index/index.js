@@ -8,7 +8,7 @@ Page({
     userInfo: null,
     userInfoAuthorized: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    remindInfo: "踢一下功能紧急开发中...",
+    remindInfo: "踢一下功能玩命开发中...",
     appliedPlan: null,
     appliedPlanDeail: null,
     offset: (new Date()).getTimezoneOffset() / -60
@@ -32,23 +32,18 @@ Page({
       // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
       // 所以此处加入 callback 以防止这种情况
       app.userInfoReadyCallback = res => {
-        // setTimeout(function () {
-        //   //要延时执行的代码
-        // }, 20000)
         that.setData({
           userInfo: res.userInfo,
         });
       };
     };
-    //如果有userId 就设置给当前页面的userId,如果没有就重新获取
-    if (app.globalData.userId) {
-      that.setData({
-        userId: app.globalData.userId
-      });
-    }
+    that.setData({
+      userId: app.globalData.userId
+    });
   },
   onShow: function () {
     var that = this;
+    //如果有userId 直接获取,如果没有就重新获取
     if (that.data.userId)
       that.getUserAppliedPlan(that.data.userId);
     else
@@ -57,51 +52,62 @@ Page({
   //从服务器获取plans
   getUserAppliedPlan: function (id) {
     var that = this;
+    wx.hideLoading();
     wx.showLoading({
       title: '加载中',
     })
     wx.request({
       url: app.globalData.host + "/plan/plan-info/list/" + id,
       success: res => {
-        if (res.data.length > 0 && res.data[0].appled == 1) {
-          that.setData({
-            appliedPlan: res.data[0]
-          });
-          that.getPlanDetail(that.data.appliedPlan.id);
-        } else {
-          that.setData({
-            appliedPlan: null
-          });
+        if (res.statusCode < 300) {
+          if (res.data.length > 0 && res.data[0].appled == 1) {
+            that.setData({
+              appliedPlan: res.data[0]
+            });
+            that.getPlanDetail(that.data.appliedPlan.id);
+          } else {
+            that.setData({
+              appliedPlan: null
+            });
+            wx.hideLoading();
+          }
         }
+        else
+          that.showFailToast('请求错误，请稍候重试');
       },
       fail: res => {
-
+        that.showFailToast('网络异常，请稍候重试');
       },
       complete: res => {
-        wx.hideLoading();
+
       }
     })
   },
   getPlanDetail: function (id) {
     var that = this;
+    wx.hideLoading();
     wx.showLoading({
       title: '加载中',
     })
     wx.request({
       url: app.globalData.host + "/plan/plan-info/detail/" + id + "?offSet=" + that.data.offset,
       success: res => {
-        if (res.data.length > 0) {
-          that.setData({
-            appliedPlanDeail: res.data
-          })
-        } else {
-          that.setData({
-            appliedPlanDeail: null
-          });
+        if (res.statusCode < 300) {
+          if (res.data.length > 0) {
+            that.setData({
+              appliedPlanDeail: res.data
+            })
+          } else {
+            that.setData({
+              appliedPlanDeail: null
+            });
+          }
         }
+        else
+          that.showFailToast('请求错误，请稍候重试');
       },
       fail: res => {
-
+        that.showFailToast('网络异常，请稍候重试');
       },
       complete: res => {
         wx.hideLoading();
@@ -111,29 +117,44 @@ Page({
   //从服务器获取用户信息
   getUserInfoFromServer: function () {
     var that = this
+    var inRequest;
     // 登录 
     wx.showLoading({
       title: '加载中',
     })
     wx.login({
       success: res => {
+        wx.hideLoading();
+        wx.showLoading({
+          title: '加载中',
+        })
         wx.request({
           url: app.globalData.host + '/plan/login/get/userInfo?jscode=' + res.code,
           success: res => {
-            app.globalData.userId = res.data;
-            that.setData({
-              userId: res.data
-            });
-            that.getUserAppliedPlan(that.data.userId);
+            if (res.statusCode < 300) {
+              app.globalData.userId = res.data;
+              that.setData({
+                userId: res.data
+              });
+              that.getUserAppliedPlan(that.data.userId);
+            }
+            else
+              that.showFailToast('请求错误，请稍候重试');
           },
           fail: res => {
-
+            that.showFailToast('网络异常，请稍候重试');
           },
           complete: res => {
-            wx.hideLoading();
+
           }
         })
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
+      },
+      fail: res => {
+        that.showFailToast('网络异常，请稍候重试');
+      },
+      complete: res => {
+
       }
     })
   },
@@ -149,19 +170,20 @@ Page({
       //用户按了允许授权按钮
       var that = this;
       //设置用户信息为全局变量
-      console.log("login user Info " + e.detail.userInfo.nickName)
       app.globalData.userInfo = e.detail.userInfo
       this.setData({
         userInfo: e.detail.userInfo,
         userInfoAuthorized: true
       });
+      if (!this.data.userId)
+        this.getUserInfoFromServer();
       if (app.callBackForMy)
         app.callBackForMy();
     } else {
       //用户按了拒绝按钮
       wx.showModal({
         showTitle: false,
-        content: '您拒绝了授权, 请授权后再进入',
+        content: e.detail.errMsg == 'getUserInfo:fail auth deny' ? '您拒绝了授权, 请授权后再进入' : '授权失败，请稍候重试',
         showCancel: false,
         confirmText: '确定',
         success: function (res) {
@@ -190,19 +212,23 @@ Page({
         'content-type': 'application/json' // 默认值
       },
       method: 'PUT',
-      success: function (res) {
-        var item = "appliedPlanDeail[" + index + "].finished";
-        that.setData({
-          [item]: nextFinished
-        });
-        var desc = nextFinished ? "已完成" : "未完成";
-        that.showSuccessToast(desc);
+      success: res => {
+        if (res.statusCode < 300) {
+          var item = "appliedPlanDeail[" + index + "].finished";
+          that.setData({
+            [item]: nextFinished
+          });
+          var desc = nextFinished ? "已完成" : "未完成";
+          that.showSuccessToast(desc);
+        }
+        else
+          that.showFailToast('请求错误，请稍候重试');
       },
       fail: res => {
-
+        that.showFailToast('网络异常，请稍候重试');
       },
       complete: res => {
-        
+
       }
     })
   },
@@ -210,7 +236,14 @@ Page({
     wx.showToast({
       title: desc,
       icon: 'success',
-      duration: 1000
+      duration: 1500
+    });
+  },
+  showFailToast: function (desc) {
+    wx.showToast({
+      title: desc,
+      icon: 'none',
+      duration: 2000
     });
   },
   dircetToMy: function () {

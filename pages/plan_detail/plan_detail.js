@@ -57,7 +57,7 @@ Page({
         }
       },
       fail: res => {
-
+        that.showFailToast('网络异常，请稍候重试');
       },
       complete: res => {
         wx.hideLoading();
@@ -83,7 +83,7 @@ Page({
         }
       },
       fail: res => {
-
+        that.showFailToast('网络异常，请稍候重试');
       },
       complete: res => {
         wx.hideLoading();
@@ -110,7 +110,14 @@ Page({
     wx.showToast({
       title: desc,
       icon: 'success',
-      duration: 1000
+      duration: 1500
+    });
+  },
+  showFailToast: function (desc) {
+    wx.showToast({
+      title: desc,
+      icon: 'none',
+      duration: 2000
     });
   },
   /**
@@ -168,7 +175,7 @@ Page({
               that.showSuccessToast("删除成功");
             },
             fail: res => {
-
+              that.showFailToast('网络异常，请稍候重试');
             },
             complete: res => {
               
@@ -206,7 +213,7 @@ Page({
               that.showSuccessToast("删除成功")
             },
             fail: res => {
-
+              that.showFailToast('网络异常，请稍候重试');
             },
             complete: res => {
               
@@ -245,7 +252,7 @@ Page({
         that.showSuccessToast("修改成功");
       },
       fail: res => {
-
+        that.showFailToast('网络异常，请稍候重试');
       },
       complete: res => {
         
@@ -309,7 +316,7 @@ Page({
         that.showSuccessToast("添加成功");
       },
       fail: res => {
-
+        that.showFailToast('网络异常，请稍候重试');
       },
       complete: res => {
 
@@ -366,7 +373,7 @@ Page({
         that.showSuccessToast("修改成功");
       },
       fail: res => {
-
+        that.showFailToast('网络异常，请稍候重试');
       },
       complete: res => {
         
@@ -393,7 +400,6 @@ Page({
         'content-type': 'application/json' // 默认值
       },
       success: function (res) {
-        console.log("inserted: " + res.data);
         var times = that.data.noticeDetail == null ? [] : that.data.noticeDetail
         times.push({
           "id": res.data.id,
@@ -408,7 +414,7 @@ Page({
         that.showSuccessToast("添加成功");
       },
       fail: res => {
-
+        that.showFailToast('网络异常，请稍候重试');
       },
       complete: res => {
         

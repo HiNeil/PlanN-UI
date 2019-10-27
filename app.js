@@ -27,9 +27,7 @@ App({
       }
     });
     //获取userId
-    if (!this.globalData.userId) {
       this.getUserInfoFromServer();
-    };
   },
   //从服务器获取用户信息
   getUserInfoFromServer: function () {

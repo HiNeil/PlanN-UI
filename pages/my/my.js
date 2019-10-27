@@ -58,6 +58,8 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
+    if (!this.data.userId || !this.data.userInfo)
+      this.initData()
     if (this.data.userInfo && this.data.userId)
       this.getUserPlans(this.data.userId);
     else
@@ -73,18 +75,23 @@ Page({
   },
 
   getUserPlans: function (id) {
+    var that = this
     wx.showLoading({
       title: '加载中',
     })
     wx.request({
       url: app.globalData.host + "/plan/plan-info/list/" + id,
       success: res => {
-        this.setData({
-          plans: res.data
-        })
+        if (res.statusCode < 300) {
+          that.setData({
+            plans: res.data
+          });
+        }
+        else
+          that.showFailToast('请求错误，请稍候重试');
       },
       fail: res => {
-
+        that.showFailToast('网络异常，请稍候重试');
       },
       complete: res => {
         wx.hideLoading();
@@ -122,23 +129,20 @@ Page({
           wx.request({
             url: app.globalData.host + "/plan/plan-info/list/" + userId,
             success: res => {
-              var firstPlan = res.data[0]
-              if (firstPlan && firstPlan.appled) {
-                wx.showModal({
-                  content: '请先取消已激活的计划',
-                  showCancel: false,
-                  success: function (res) {
-                    if (res.confirm) {
-                      console.log('用户点击确定')
-                    }
-                  }
-                });
-              } else {
-                that.setApplied(index);
+              if (res.statusCode < 300) {
+                var firstPlan = res.data[0]
+                if (firstPlan && firstPlan.appled) {
+                  // wx.hideLoading();
+                  that.showFailToast('请先取消已激活计划');
+                } else {
+                  that.setApplied(index);
+                }
               }
+              else
+                that.showFailToast('请求错误，请稍候重试');
             },
             fail: res => {
-
+              that.showFailToast('网络异常，请稍候重试');
             },
             complete: res => {
 
@@ -156,16 +160,20 @@ Page({
             url: app.globalData.host + "/plan/plan-change/delete/" + userId + "/" + planId,
             method: "DELETE",
             success: res => {
-              var deletedPlans = that.data.plans.filter((ele, idx) => {
-                return idx != index
-              });
-              that.setData({
-                plans: deletedPlans
-              });
-              that.showSuccessToast("删除成功");
+              if (res.statusCode < 300) {
+                var deletedPlans = that.data.plans.filter((ele, idx) => {
+                  return idx != index
+                });
+                that.setData({
+                  plans: deletedPlans
+                });
+                that.showSuccessToast("删除成功");
+              }
+              else
+                that.showFailToast('请求错误，请稍候重试');
             },
             fail: res => {
-
+              that.showFailToast('网络异常，请稍候重试');
             },
             complete: res => {
 
@@ -179,28 +187,26 @@ Page({
    * 更多计划相关
    */
   addPlan: function () {
-    var plans = this.data.plans ? this.data.plans : [];
+    var that = this
+    var plans = that.data.plans ? that.data.plans : [];
     if (plans.length >= 10) {
-      wx.showModal({
-        showTitle: false,
-        content: '超出数量限制，请删除后再添加',
-        showCancel: false,
-        confirmText: '确定',
-        success: function (res) {
-          if (res.confirm) {
-            console.log('用户点击了“确定”')
-          }
-        }
-      })
+      that.showFailToast('超出数量限制，请删除后再添加');
     } else {
-      this.showAddPlan();
+      that.showAddPlan();
     }
   },
   showSuccessToast: function (desc) {
     wx.showToast({
       title: desc,
       icon: 'success',
-      duration: 1000
+      duration: 1500
+    });
+  },
+  showFailToast: function (desc) {
+    wx.showToast({
+      title: desc,
+      icon: 'none',
+      duration: 2000
     });
   },
   /**
@@ -244,23 +250,26 @@ Page({
         'content-type': 'application/json' // 默认值
       },
       success: function (res) {
-        console.log("inserted: " + res.data);
-        var plans = that.data.plans ? that.data.plans : []
-        plans.push({
-          id: res.data.id,
-          userId: res.data.userId,
-          planName: res.data.planName,
-          appled: res.data.appled,
-          number: res.data.number,
-          appled: res.data.appled,
-        });
-        that.setData({
-          plans: plans
-        });
-        that.showSuccessToast("添加成功");
+        if (res.statusCode < 300) {
+          var plans = that.data.plans ? that.data.plans : []
+          plans.push({
+            id: res.data.id,
+            userId: res.data.userId,
+            planName: res.data.planName,
+            appled: res.data.appled,
+            number: res.data.number,
+            appled: res.data.appled,
+          });
+          that.setData({
+            plans: plans
+          });
+          that.showSuccessToast("添加成功");
+        }
+        else
+          that.showFailToast('请求错误，请稍候重试');
       },
       fail: res => {
-
+        that.showFailToast('网络异常，请稍候重试');
       },
       complete: res => {
 
@@ -272,6 +281,7 @@ Page({
     var planId = that.data.plans[index].id;
     var userId = that.data.userId;
     var nextApplied = that.data.plans[index].appled ? 0 : 1;
+    wx.hideLoading();
     wx.showLoading();
     wx.request({
       url: app.globalData.host + '/plan/plan-change/modify/' + userId + '/' + planId,
@@ -283,19 +293,22 @@ Page({
         'content-type': 'application/json' // 默认值
       },
       success: function (res) {
-        var plan = 'plans[' + index + "]." + "appled"
-        that.setData({
-          [plan]: nextApplied
-        });
-        var desc = nextApplied == 0 ? "取消成功" : "激活成功"
-        that.showSuccessToast(desc);
-        console.log(res.data);
+        if (res.statusCode < 300) {
+          var plan = 'plans[' + index + "]." + "appled"
+          that.setData({
+            [plan]: nextApplied
+          });
+          var desc = nextApplied == 0 ? "取消成功" : "激活成功"
+          that.showSuccessToast(desc);
+        }
+        else
+          that.showFailToast('请求错误，请稍候重试');
       },
       fail: res => {
-
+        that.showFailToast('网络异常，请稍候重试');
       },
       complete: res => {
-        
+
       }
     })
   },

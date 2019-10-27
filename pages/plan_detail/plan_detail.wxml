@@ -47,15 +47,15 @@
   </view>
 
   <modal id="addModal" confirm-text="提交" cancel-text="取消" confirm-type="222" hidden="{{addModelHide}}" bindconfirm="newToserver" bindcancel="hideAddItem">
-    <input type="text" value="{{inputedItem}}" placeholder="请输入计划项描述" maxlength="20" focus="true" bindblur="getInputItem" bindinput="getInputItem" bindconfirm="getInputItem" />
+    <input type="text" value="{{inputedItem}}" placeholder="请输入计划项描述" maxlength="15" focus="true" bindblur="getInputItem" bindinput="getInputItem" bindconfirm="getInputItem" />
   </modal>
 
   <modal id="editModal" confirm-text="提交" cancel-text="取消" confirm-type="222" hidden="{{editModelHide}}" bindconfirm="editToserver" bindcancel="hideEditItem">
-    <input type="text" value="{{editedItem.description}}" placeholder="请输入计划项描述" maxlength="20" focus="true" bindblur="getEditItem" bindinput="getEditItem" bindconfirm="getEditItem" />
+    <input type="text" value="{{editedItem.description}}" placeholder="请输入计划项描述" maxlength="15" focus="true" bindblur="getEditItem" bindinput="getEditItem" bindconfirm="getEditItem" />
   </modal>
 
   <modal id="editPlanModal" confirm-text="提交" cancel-text="取消" confirm-type="222" hidden="{{editPlanModelHide}}" bindconfirm="editPlanToserver" bindcancel="hideEditPlan">
-    <input type="text" value="{{inputedPlan}}" placeholder="请输入计划名称" maxlength="20" focus="true" bindblur="getEditPlan" bindinput="getEditPlan" bindconfirm="getEditPlan" />
+    <input type="text" value="{{inputedPlan}}" placeholder="请输入计划名称" maxlength="10" focus="true" bindblur="getEditPlan" bindinput="getEditPlan" bindconfirm="getEditPlan" />
   </modal>
 
 </view>
