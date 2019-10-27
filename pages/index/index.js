@@ -13,6 +13,10 @@ Page({
     appliedPlanDeail: null,
     offset: (new Date()).getTimezoneOffset() / -60
   },
+  onPullDownRefresh: function () {
+    this.onShow();
+    wx.stopPullDownRefresh();
+  },
   onLoad: function () {
     var that = this
     wx.getSetting({
@@ -42,6 +46,7 @@ Page({
     });
   },
   onShow: function () {
+    // wx.showNavigationBarLoading();
     var that = this;
     //如果有userId 直接获取,如果没有就重新获取
     if (that.data.userId)

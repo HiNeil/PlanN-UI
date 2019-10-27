@@ -9,11 +9,12 @@
     "pages/plan_detail/plan_detail"
   ],
   "window": {
-    "backgroundTextStyle": "light",
     "backgroundColor": "#fff",
     "navigationBarBackgroundColor": "#eeeeee",
     "navigationBarTitleText": "每日计划",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "black",
+    "enablePullDownRefresh": true,
+    "backgroundTextStyle": "dark"
   },
   "sitemapLocation": "sitemap.json",
   "tabBar": {

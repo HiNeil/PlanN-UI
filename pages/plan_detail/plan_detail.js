@@ -26,7 +26,7 @@ Page({
     /**
      * 如果userId 或者 currentDetailPlan 为空的话 就跳回首页
      */
-    if (that.data.userId == null || app.globalData.currentDetailPlan == null) {
+    if (that.data.userId == null) {
       wx.switchTab({
         url: '../my/my',
       })
@@ -104,6 +104,9 @@ Page({
       inputedPlan: null
     });
     app.globalData.currentDetailPlan = null;
+    wx.switchTab({
+      url: '../my/my',
+    })
   },
 
   showSuccessToast: function (desc) {
