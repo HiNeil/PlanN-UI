@@ -156,7 +156,6 @@ Page({
           wx.navigateTo({
             url: '../plan_detail/plan_detail',
           });
-          console.log("跳转到详情页");
         } else if (res.tapIndex == 2) {
           wx.showLoading();
           wx.request({
@@ -202,7 +201,7 @@ Page({
     wx.showToast({
       title: desc,
       icon: 'success',
-      duration: 1500
+      duration: 1000
     });
   },
   showFailToast: function (desc) {

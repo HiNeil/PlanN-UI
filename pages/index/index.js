@@ -49,10 +49,15 @@ Page({
     // wx.showNavigationBarLoading();
     var that = this;
     //如果有userId 直接获取,如果没有就重新获取
-    if (that.data.userId)
-      that.getUserAppliedPlan(that.data.userId);
+    if (!that.data.userId)
+      app.userIdReadyCallBack = userId => {
+        that.setData({
+          userId: userId
+        });
+        that.getUserAppliedPlan(that.data.userId);
+      }
     else
-      that.getUserInfoFromServer();
+      that.getUserAppliedPlan(that.data.userId);
   },
   //从服务器获取plans
   getUserAppliedPlan: function (id) {
@@ -122,7 +127,6 @@ Page({
   //从服务器获取用户信息
   getUserInfoFromServer: function () {
     var that = this
-    var inRequest;
     // 登录 
     wx.showLoading({
       title: '加载中',
@@ -241,7 +245,7 @@ Page({
     wx.showToast({
       title: desc,
       icon: 'success',
-      duration: 1500
+      duration: 1000
     });
   },
   showFailToast: function (desc) {

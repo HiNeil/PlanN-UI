@@ -113,7 +113,7 @@ Page({
     wx.showToast({
       title: desc,
       icon: 'success',
-      duration: 1500
+      duration: 1000
     });
   },
   showFailToast: function (desc) {
@@ -246,7 +246,6 @@ Page({
         'content-type': 'application/json' // 默认值
       },
       success: function (res) {
-        console.log("edited: " + res.data);
         var index = that.data.editIndex;
         var itemDesc = "planDetail[" + index + "].description";
         that.setData({
@@ -269,7 +268,6 @@ Page({
     this.setData({
       inputedItem: e.detail.value.trim()
     });
-    console.log(this.data.inputedItem);
   },
   showAddItem: function () {
     this.setData({
@@ -303,7 +301,6 @@ Page({
         'content-type': 'application/json' // 默认值
       },
       success: function (res) {
-        console.log("inserted: " + res.data);
         var planItems = that.data.planDetail == null ? [] : that.data.planDetail
         planItems.push({
           description: res.data.description,
@@ -368,7 +365,6 @@ Page({
         'content-type': 'application/json' // 默认值
       },
       success: function (res) {
-        console.log("edited plan: " + res.data);
         var newPlan = "plan.planName";
         that.setData({
           [newPlan]: newPlanName
@@ -387,7 +383,6 @@ Page({
    * 编辑时间相关
    */
   timeChange: function (e) {
-    console.log(e.detail.value)
     var that = this
     var time = e.detail.value
     var planId = that.data.plan.id

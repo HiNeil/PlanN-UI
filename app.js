@@ -38,7 +38,10 @@ App({
           url: this.globalData.host + '/plan/login/get/userInfo?jscode=' + res.code,
           success: res => {
             this.globalData.userId = res.data
-            console.log("userId:" + this.globalData.userId)
+            //如果拿到userId需要回掉获取plan信息给index
+            if (this.userIdReadyCallBack){
+              this.userIdReadyCallBack(this.globalData.userId);
+            }
           }
         })
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
@@ -51,6 +54,6 @@ App({
     userId: null,
     currentDetailPlan: null,
     currentPlanEditId: null,
-    host: "https://techedge.top:444"
+    host: "https://techedge.top"
   }
 })
