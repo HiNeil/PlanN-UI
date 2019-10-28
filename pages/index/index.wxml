@@ -28,17 +28,15 @@
         <view class="page__title">
           <view wx:if="{{appliedPlan}}">
             <text style="color:orange">{{appliedPlan.planName}}</text>
-            <view class="page__desc">点击可更改计划项状态</view>
+            <view class="page__desc">Click to change the status</view>
           </view>
           <view wx:else>
-            <text style="color:green">未激活计划</text>
+            <text style="color:green">No activited plan</text>
             <view class="page__desc" style="color:orange">
               <text class='dialog-close' decode='true'>&nbsp;&gt;</text> ﹏
               <text class='dialog-close' decode='true'>&lt;</text>
               </view>
           </view>
-          <!-- <text style="color:orange">日历告诉你今天要做什么</text>
-              <text style="color:orange">我来告诉你每天该做什么</text> -->
             </view>
           </view>
         </view>
@@ -77,8 +75,8 @@
             </view>
           </view>
           <view class="button-sp-area">
-            <button class="weui-btn" type="primary" plain="true" bindtap="popRemind" bindlongtap="popRemind">踢一下
-              <text style="color:orange">TA</text>
+            <button class="weui-btn" type="primary" plain="true" bindtap="popRemind" bindlongtap="popRemind">Kick
+              <text style="color:orange">it</text>
             </button>
           </view>
         </view>

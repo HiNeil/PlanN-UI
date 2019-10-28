@@ -11,7 +11,7 @@
     </view>
   </view>
   <view class="page__bd page__bd_spacing">
-    <view class="weui-cells__title">计划项</view>
+    <view class="weui-cells__title">Items</view>
     <view class="weui-cells weui-cells_after-title">
       <view wx:if="{{planDetail!=null && planDetail.length>0}}">
         <block wx:for="{{planDetail}}" wx:for-item="planItem" wx:key="id" wx:for-index="idx" ex:key="number">
@@ -24,10 +24,10 @@
       </view>
     </view>
     <view class="text-more">
-      <text class="text-style" bindtap="showAddItem">点击新增</text>
+      <text class="text-style" bindtap="showAddItem">+ item</text>
     </view>
 
-    <view class="weui-cells__title">提醒时间</view>
+    <view class="weui-cells__title">Time</view>
     <view class="weui-cells weui-cells_after-title">
       <view wx:if="{{noticeDetail!=null && noticeDetail.length>0}}">
         <block wx:for="{{noticeDetail}}" wx:for-item="noticeItem" wx:key="id" wx:for-index="idx">
@@ -41,7 +41,7 @@
     </view>
     <picker mode="time" start="00:10" end="23:50" bindchange="timeChange" bindcancel="">
       <view class="text-more">
-        <text class="text-style">点击新增</text>
+        <text class="text-style">+ time</text>
       </view>
     </picker>
   </view>
